@@ -61,6 +61,18 @@ app.config["MAX_CONTENT_LENGTH"] = MAX_UPLOAD_BYTES
 # invalidate everyone's current session.
 app.secret_key = os.environ.get("SECRET_KEY") or secrets.token_hex(32)
 
+# Hardens the session cookie for a public deployment. HttpOnly blocks
+# client-side JS from reading it (defense against any future XSS); SameSite
+# "Lax" blocks it being sent on cross-site requests; Secure requires an
+# HTTPS connection -- Render terminates TLS at its edge and forces HTTPS,
+# and modern browsers also treat 127.0.0.1/localhost as a secure context,
+# so local testing via run.bat / production_server.py is unaffected.
+app.config.update(
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE="Lax",
+    SESSION_COOKIE_SECURE=True,
+)
+
 # Per-browser-session result store. Earlier builds used a single shared
 # module-level dict (_LAST_RESULT) for the most recent analysis; that is
 # safe for one local user but means, on a public multi-user deployment,
