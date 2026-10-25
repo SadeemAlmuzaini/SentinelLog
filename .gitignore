@@ -1,0 +1,24 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+*.log
+*_log.txt
+.pytest_cache/
+*.egg-info/
+
+# Timestamped project backups: kept on disk intentionally (never deleted,
+# per project policy) but not tracked in git -- a reproducible repo should
+# not carry redundant full copies of backend/frontend/tests in its history.
+_backup_*/
+
+# Misc OS/editor noise
+.DS_Store
+instance/
+
+# Temporary helper scripts/output created during local verification
+_run_*.bat
+test_output.txt
+pip_install_output.txt
+production_output.txt
