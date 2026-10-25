@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SentinelLog — Firewall Log Analyzer</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="logo">
+      <div class="logo-icon"><i class="fa-solid fa-shield-halved"></i></div>
+      <div class="logo-content">
+        <h2>SentinelLog</h2>
+        <span>Firewall Log Analyzer</span>
+      </div>
+    </div>
+    <ul class="nav-menu">
+      <li><a href="#dashboard">Dashboard</a></li>
+      <li><a href="#charts">Analytics</a></li>
+      <li><a href="#report">AI Report</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="container">
+
+  <div class="page-intro">
+    <div class="page-intro-text">
+      <span class="eyebrow">Security Operations</span>
+      <h1>Firewall Log Analysis</h1>
+      <p>Upload a firewall connection log to get a risk score, traffic breakdown, and detailed suspicious activity findings.</p>
+    </div>
+    <div class="intro-status">
+      <span class="status-pill"><span class="dot"></span>Analysis engine online</span>
+      <span class="status-pill"><i class="fa-solid fa-lock" style="font-size:10px;color:var(--text-faint)"></i>Processed in memory only</span>
+    </div>
+  </div>
+
+  <section id="upload-section">
+    <div class="upload-card">
+      <label for="logFile" class="upload-label">
+        <div class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+        <h3>Drop your CSV log file here</h3>
+        <p>or click to browse — .csv files only</p>
+      </label>
+      <input type="file" id="logFile" accept=".csv" style="display:none">
+      <div id="selectedFile"></div>
+      <div id="uploadStatus" class="upload-status info"></div>
+      <button id="analyzeButton"><i class="fa-solid fa-magnifying-glass-chart"></i> Analyze Logs</button>
+    </div>
+  </section>
+
+  <section id="dashboard">
+    <div class="section-header">
+      <span>Overview</span>
+      <h2>Dashboard</h2>
+      <p>Key metrics calculated directly from the uploaded log.</p>
+    </div>
+    <div class="stats-container">
+      <div class="stat-card" data-metric="risk">
+        <div class="card-icon"><i class="fa-solid fa-gauge-high"></i></div>
+        <div class="card-title">Risk Score</div>
+        <div class="card-value" id="threatCount">—</div>
+      </div>
+      <div class="stat-card" data-metric="threat">
+        <div class="card-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <div class="card-title">Threat Level</div>
+        <div class="card-value" id="threatLevel">—</div>
+      </div>
+      <div class="stat-card" data-metric="blocked">
+        <div class="card-icon"><i class="fa-solid fa-ban"></i></div>
+        <div class="card-title">Blocked</div>
+        <div class="card-value" id="blockedCount">—</div>
+      </div>
+      <div class="stat-card" data-metric="allowed">
+        <div class="card-icon"><i class="fa-solid fa-circle-check"></i></div>
+        <div class="card-title">Allowed</div>
+        <div class="card-value" id="allowedCount">—</div>
+      </div>
+      <div class="stat-card" data-metric="countries">
+        <div class="card-icon"><i class="fa-solid fa-earth-americas"></i></div>
+        <div class="card-title">Countries</div>
+        <div class="card-value" id="countryCount">—</div>
+      </div>
+      <div class="stat-card" data-metric="protocols">
+        <div class="card-icon"><i class="fa-solid fa-diagram-project"></i></div>
+        <div class="card-title">Protocols</div>
+        <div class="card-value" id="protocolCount">—</div>
+      </div>
+      <div class="stat-card" data-metric="traffic">
+        <div class="card-icon"><i class="fa-solid fa-arrow-right-arrow-left"></i></div>
+        <div class="card-title">Total Connections</div>
+        <div class="card-value" id="trafficCount">—</div>
+      </div>
+      <div class="stat-card" data-metric="port">
+        <div class="card-icon"><i class="fa-solid fa-plug"></i></div>
+        <div class="card-title">Top Port</div>
+        <div class="card-value" id="topPort">—</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="charts">
+    <div class="section-header">
+      <span>Analytics</span>
+      <h2>Traffic Analytics</h2>
+      <p>Visual breakdown of connections, geography, protocols, and ports.</p>
+    </div>
+    <div class="charts-grid">
+
+      <div class="chart-card">
+        <div class="chart-title"><i class="fa-solid fa-chart-line"></i><h3>Connections</h3></div>
+        <div class="chart-canvas-wrap">
+          <canvas id="trafficChart"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-title"><i class="fa-solid fa-earth-americas"></i><h3>Top Countries</h3></div>
+        <div class="country-layout">
+          <div class="country-chart"><canvas id="countryChart"></canvas></div>
+          <div class="country-legend" id="countryLegend"></div>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-title"><i class="fa-solid fa-chart-pie"></i><h3>Protocol Distribution</h3></div>
+        <div class="chart-canvas-wrap short">
+          <canvas id="protocolChart"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-title"><i class="fa-solid fa-chart-area"></i><h3>Traffic Over Time</h3></div>
+        <div class="chart-canvas-wrap short">
+          <canvas id="trafficUsageChart"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card full">
+        <div class="chart-title"><i class="fa-solid fa-bars-progress"></i><h3>Top Destination Ports</h3></div>
+        <div class="chart-canvas-wrap tall">
+          <canvas id="portsChart"></canvas>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="findings-section">
+    <div class="section-header">
+      <span>Investigation</span>
+      <h2>Suspicious Activity Findings</h2>
+      <p>Rule-based detections with evidence, affected entities, and recommended action.</p>
+    </div>
+    <div class="findings-list" id="findingsList">
+      <div class="findings-empty">Upload and analyze a log file to see findings here.</div>
+    </div>
+  </section>
+
+  <section id="report">
+    <div class="section-header">
+      <span>Summary</span>
+      <h2>AI Report</h2>
+      <p>Template-generated summary of this analysis — not an AI-written assessment.</p>
+    </div>
+    <div class="report-card">
+      <div class="report-top">
+        <div class="report-logo"><i class="fa-solid fa-file-shield"></i></div>
+        <div>
+          <h3>SentinelLog Security Report</h3>
+          <span>Generated from the current analysis</span>
+        </div>
+      </div>
+      <div class="report-content" id="aiReport">
+        <p>Upload and analyze a log file to generate a report.</p>
+      </div>
+      <div class="report-footer">
+        <button id="downloadPDF"><i class="fa-solid fa-file-pdf"></i> Download PDF Report</button>
+        <button id="downloadJSON" class="secondary-export"><i class="fa-solid fa-file-code"></i> Export JSON</button>
+        <button id="downloadFindingsCSV" class="secondary-export"><i class="fa-solid fa-file-csv"></i> Export Findings CSV</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer class="footer">
+  <h3>SentinelLog</h3>
+  <p>Rule-based firewall log analysis. Processed in memory — logs are never stored on disk.</p>
+  <span>&copy; 2026 SentinelLog. All analysis is explainable and template-generated, not AI-written.</span>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/marked@15.0.12/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
